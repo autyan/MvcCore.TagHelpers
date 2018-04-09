@@ -1,0 +1,9 @@
+﻿@model List<TableSampleData>
+@addTagHelper *, MvcCore.TagHelpers
+@{
+    ViewBag.Title = "TableTagHelperSample";
+}
+
+<div>
+    <mvc-table class="table table-bordered table-hover table-striped" item-source="@Model"></mvc-table>
+</div>
