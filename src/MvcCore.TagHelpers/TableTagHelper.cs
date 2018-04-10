@@ -1,5 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using MvcCore.TagHelpers.Table;
@@ -21,6 +25,9 @@ namespace MvcCore.TagHelpers
 
         [HtmlAttributeName("table-columns")]
         public string Columns { get; set; }
+
+        [HtmlAttributeName("column-ignore")]
+        public string IgnoreColumns { get; set; }
 
         [HtmlAttributeName("table-form-id")]
         public string FromId { get; set; } = "queryForm";
@@ -62,10 +69,12 @@ namespace MvcCore.TagHelpers
         private void SetupDefaultColumnTemplate(TagHelperContext context)
         {
             _columnTemplates = new List<ColumnTemplate>();
+            var ignoreColumns = IgnoreColumns?.Split(',');
             if (_columns != null)
             {
                 foreach (var pair in _columns)
                 {
+                    if (ignoreColumns != null && ignoreColumns.Contains(pair.Key)) continue;
                     _columnTemplates.Add(new ColumnTemplate
                     {
                         ColumnName = pair.Key,
@@ -77,11 +86,29 @@ namespace MvcCore.TagHelpers
             {
                 foreach (var propertyInfo in _rowItemCollection.ItemPropertyInfos)
                 {
-                    _columnTemplates.Add(new ColumnTemplate
+                    if (ignoreColumns != null && ignoreColumns.Contains(propertyInfo.Name)) continue;
+
+                    var display = propertyInfo.GetCustomAttribute(typeof(DisplayAttribute)) as DisplayAttribute;
+                    var displayName = propertyInfo.GetCustomAttribute(typeof(DisplayNameAttribute)) as DisplayNameAttribute;
+
+                    var template = new ColumnTemplate
                     {
                         ColumnName = propertyInfo.Name,
-                        HeaderName = propertyInfo.Name
-                    });
+                    };
+                    if (display != null)
+                    {
+                        template.HeaderName = display.Name;
+                    }
+                    else if (displayName != null)
+                    {
+                        template.HeaderName = displayName.DisplayName;
+                    }
+                    else
+                    {
+                        template.HeaderName = propertyInfo.Name;
+                    }
+
+                    _columnTemplates.Add(template);
                 }
             }
 
