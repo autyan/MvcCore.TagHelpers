@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using MvcCore.TagHelpers.Pager;
 
-namespace MvcCore.TagHelpers.Pager
+namespace MvcCore.TagHelpers
 {
     [HtmlTargetElement("mvc-pager")]
     public class PagerTaghelper : TagHelper
@@ -18,7 +20,7 @@ namespace MvcCore.TagHelpers.Pager
 
         private int? _skip;
 
-        private readonly StringBuilder _tageBuilder = new StringBuilder();
+        //private readonly StringBuilder _tageBuilder = new StringBuilder();
 
         private readonly HttpContext _httpContext;
 
@@ -77,13 +79,24 @@ namespace MvcCore.TagHelpers.Pager
         {
             output.TagName = "div";
 
-            //append nav element
-            _tageBuilder.Append("<nav style=\"float:right;\"><ul class=\"pagination\">");
+            var ulTag = new TagBuilder("ul");
+            ulTag.Attributes["class"] = "pagination";
 
             //append firstPage button
-            _tageBuilder.Append(HasPreviousPagers
-                ? $"<li><a href=\"{LinkHref}skip=0&take={Take}\" aria-label=\"Head\"><span aria-hidden=\"true\">&laquo;</span></a></li>"
-                : "<li class=\"disabled\"><a href=\"#\" aria-label=\"Head\"><span aria-hidden=\"true\">&laquo;</span></a></li>");
+            var startTag = HasPreviousPagers
+                ? new PagerMarkTagBuilder
+                {
+                    Href = $"{LinkHref}skip=0&take={Take}",
+                    IsStart = true
+                }
+                : new PagerMarkTagBuilder
+                {
+                    Href = "#",
+                    IsStart = true,
+                    Disabled = true
+                };
+
+            ulTag.InnerHtml.AppendHtml(startTag.Build());
 
             //append pagers before currentPage
             var beforeIndexCount = PageIndex - RenderPagerCount / 2;
@@ -91,29 +104,57 @@ namespace MvcCore.TagHelpers.Pager
             var currentIndex = startIndex;
             while (currentIndex < PageIndex)
             {
-                _tageBuilder.Append($"<li><a href=\"{LinkHrefWithQueryParamters(currentIndex)}\">{currentIndex}</a></li>");
+                ulTag.InnerHtml.AppendHtml(new PagerMarkTagBuilder
+                {
+                    Href = LinkHrefWithQueryParamters(currentIndex),
+                    PageIndex = currentIndex
+                }.Build());
                 currentIndex += 1;
             }
 
             //append currentPager
-            _tageBuilder.Append($"<li class=\"active\"><a href=\"{LinkHrefWithQueryParamters(PageIndex)}\">{PageIndex}</a></li>");
+            ulTag.InnerHtml.AppendHtml(new PagerMarkTagBuilder
+            {
+                Href = LinkHrefWithQueryParamters(PageIndex),
+                PageIndex = PageIndex,
+                IsActive = true
+            }.Build());
             currentIndex += 1;
 
             //append pagers after currentPage
             var finalPage = (startIndex + RenderPagerCount) > TotalPage ? TotalPage : RenderPagerCount;
             while (currentIndex < finalPage)
             {
-                _tageBuilder.Append($"<li><a href=\"{LinkHrefWithQueryParamters(currentIndex)}\">{currentIndex}</a></li>");
+                ulTag.InnerHtml.AppendHtml(new PagerMarkTagBuilder
+                {
+                    Href = LinkHrefWithQueryParamters(currentIndex),
+                    PageIndex = currentIndex
+                }.Build());
                 currentIndex += 1;
             }
 
-            _tageBuilder.Append(IsFinalPager
-                ? "<li class=\"disabled\"><a href=\"#\" aria-label=\"End\"><span aria-hidden=\"true\">&raquo;</span></a></li>"
-                : $"<li href=\"{LinkHref}skip={(TotalPage - 1) * Take}&take={Take}\"><a href=\"#\" aria-label=\"End\"><span aria-hidden=\"true\">&raquo;</span></a></li>");
+            //append finalPage button
+            var endTag = IsFinalPager
+                ? new PagerMarkTagBuilder
+                {
+                    Href = "#",
+                    IsEnd = true,
+                    Disabled = true
 
-            _tageBuilder.Append("</ul></nav>");
+                }
+                : new PagerMarkTagBuilder
+                {
+                    Href = $"{LinkHref}skip={(TotalPage - 1) * Take}&take={Take}",
+                    IsEnd = true
+                };
 
-            output.Content.AppendHtml(_tageBuilder.ToString());
+            ulTag.InnerHtml.AppendHtml(endTag.Build());
+
+            var navTag = new TagBuilder("nav");
+            navTag.Attributes["style"] = "float:right";
+            navTag.InnerHtml.AppendHtml(ulTag);
+
+            output.Content.AppendHtml(navTag);
         }
 
         private bool HasPreviousPagers => PageIndex > 1;

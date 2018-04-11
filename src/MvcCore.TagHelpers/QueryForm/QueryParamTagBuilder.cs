@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MvcCore.TagHelpers.QueryForm
 {
-    public class QueryParamTag
+    public class QueryParamTagBuilder : IElementTagBuilder
     {
         private readonly QueryParamConfig _queryParam;
 
-        public QueryParamTag(QueryParamConfig queryParam)
+        public QueryParamTagBuilder(QueryParamConfig queryParam)
         {
             _queryParam = queryParam;
         }

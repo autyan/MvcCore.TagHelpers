@@ -64,7 +64,7 @@ namespace MvcCore.TagHelpers
 
             foreach (var queryParam in _queryParamConfigs)
             {
-                var controlTag = new QueryParamTag(queryParam).Build();
+                var controlTag = new QueryParamTagBuilder(queryParam).Build();
                 panelBody.InnerHtml.AppendHtml(controlTag);
             }
 
