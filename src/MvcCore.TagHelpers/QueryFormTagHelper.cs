@@ -77,7 +77,7 @@ namespace MvcCore.TagHelpers
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            submit.Attributes["value"] = "Submit";
+            submit.Attributes["value"] = MvcTaghelperStringLocalizer.Instance["Submit"];
             submit.Attributes["type"] = "submit";
             submit.Attributes["class"] = "btn btn-primary pull-right";
 
@@ -85,7 +85,7 @@ namespace MvcCore.TagHelpers
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            reset.Attributes["value"] = "Reset";
+            reset.Attributes["value"] = MvcTaghelperStringLocalizer.Instance["Reset"];
             reset.Attributes["type"] = "reset";
             reset.Attributes["class"] = "btn btn-danger pull-right";
 
