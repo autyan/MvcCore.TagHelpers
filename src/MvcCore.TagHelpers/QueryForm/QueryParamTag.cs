@@ -72,7 +72,7 @@ namespace MvcCore.TagHelpers.QueryForm
                     controlTag.Attributes["class"] = "form-control";
                     controlTag.Attributes["placeholder"] = _queryParam.PlaceHolder;
                     controlTag.Attributes["type"] = Enum.GetName(typeof(InputControlType), _queryParam.ParamType);
-                    controlTag.Attributes["value"] = _queryParam.ParamValue.ToString();
+                    controlTag.Attributes["value"] = _queryParam.ParamValue?.ToString();
                     return controlTag;
             }
         }
