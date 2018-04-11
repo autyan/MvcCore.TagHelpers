@@ -33,3 +33,15 @@
         display: none;
     }
 }
+
+.query-form .panel-footer {
+    height: 55px;
+}
+
+.query-form .panel-footer .btn {
+    margin-left: 10px;
+}
+
+.query-form .form-group {
+    margin-right: 10px;
+}

@@ -2,6 +2,7 @@
 {
     public enum InputControlType
     {
+        UnKnown = 0,
         Button,
         Checkbox,
         Color,
@@ -24,6 +25,7 @@
         Submit,
         Tel,
         Text,
-        Url
+        Url,
+        Select = 10000
     }
 }
