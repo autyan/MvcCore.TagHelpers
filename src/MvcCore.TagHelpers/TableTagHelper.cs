@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using MvcCore.TagHelpers.Extensions;
 using MvcCore.TagHelpers.Table;
 using SmartFormat;
 
@@ -88,25 +86,13 @@ namespace MvcCore.TagHelpers
                 {
                     if (ignoreColumns != null && ignoreColumns.Contains(propertyInfo.Name)) continue;
 
-                    var display = propertyInfo.GetCustomAttribute(typeof(DisplayAttribute)) as DisplayAttribute;
-                    var displayName = propertyInfo.GetCustomAttribute(typeof(DisplayNameAttribute)) as DisplayNameAttribute;
+                    var displayName = propertyInfo.GetDisplayName();
 
                     var template = new ColumnTemplate
                     {
                         ColumnName = propertyInfo.Name,
+                        HeaderName = string.IsNullOrWhiteSpace(displayName) ? displayName : propertyInfo.Name,
                     };
-                    if (display != null)
-                    {
-                        template.HeaderName = display.Name;
-                    }
-                    else if (displayName != null)
-                    {
-                        template.HeaderName = displayName.DisplayName;
-                    }
-                    else
-                    {
-                        template.HeaderName = propertyInfo.Name;
-                    }
 
                     _columnTemplates.Add(template);
                 }
