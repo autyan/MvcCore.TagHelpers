@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using McvCore.TagHelpers.Samples.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace McvCore.TagHelpers.Samples.Controllers
@@ -37,7 +38,7 @@ namespace McvCore.TagHelpers.Samples.Controllers
             return View(tableItem);
         }
 
-        public IActionResult Upload()
+        public IActionResult Upload(List<IFormFile> files)
         {
             return View();
         }
