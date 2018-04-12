@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -22,10 +23,28 @@ namespace MvcCore.TagHelpers
         [HtmlAttributeName("query-class")]
         public string QueryControlClass { get; set; }
 
+        [HtmlAttributeName("query-ignore")]
+        public string QueryIgnoreProperty { get; set; }
+
+        private static readonly List<string> GlobalIgnoreProperties;
+
+        public static void AddIgnoreProperty(string properties)
+        {
+            GlobalIgnoreProperties.AddRange(properties.Split(','));
+        }
+
         public override void Init(TagHelperContext context)
         {
+            var ignoredProperties = new List<string>();
+            if(string.IsNullOrWhiteSpace(QueryIgnoreProperty))
+            {
+                ignoredProperties.AddRange(QueryIgnoreProperty.Split(','));
+            }
+
             foreach (var propertyInfo in Query.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
+                if (ignoredProperties.Any(i => i == propertyInfo.Name) && GlobalIgnoreProperties.Any(i => i == propertyInfo.Name)) continue;
+
                 _queryParamConfigs.Add(new QueryParamConfig(propertyInfo, Query));
             }
             base.Init(context);
