@@ -45,13 +45,25 @@ namespace MvcCore.TagHelpers.QueryForm
                     selectTag.Attributes["name"] = _queryParam.ParamName;
                     selectTag.Attributes["class"] = "form-control";
                     selectTag.Attributes["placeholder"] = _queryParam.PlaceHolder;
-                    if (!(_queryParam.ParamData is IEnumerable<SelectListItem> selectData))
+                    var selected = _queryParam.ParamValue;
+                    if (_queryParam.ParamData is SelectList selectList)
                     {
-                        throw new ArgumentException("Select control data source have to be type of (IEnumerable<SelectListItem>)");
+                        foreach (var item in selectList.Items)
+                        {
+                            if(!(item is SelectListItem selectItem)) throw new ArgumentException("Select control data source have to be type of (IEnumerable<SelectListItem>) or (SelectList)");
+                            var option = new TagBuilder("option");
+                            option.Attributes["value"] = selectItem.Value;
+                            option.InnerHtml.Append(selectItem.Text);
+                            if (selectItem.Value == selected)
+                            {
+                                option.Attributes[nameof(selected)] = nameof(selected);
+                            }
+
+                            selectTag.InnerHtml.AppendHtml(option);
+                        }
                     }
-                    else
+                    else if (_queryParam.ParamData is IEnumerable<SelectListItem> selectData)
                     {
-                        var selected = _queryParam.ParamValue;
                         foreach (var item in selectData)
                         {
                             var option = new TagBuilder("option");
@@ -65,6 +77,10 @@ namespace MvcCore.TagHelpers.QueryForm
                             selectTag.InnerHtml.AppendHtml(option);
                         }
                     }
+                    else
+                    {
+                        throw new ArgumentException("Select control data source have to be type of (IEnumerable<SelectListItem>) or (SelectList)");
+                    }
                     return selectTag;
                 default:
                     var controlTag = new TagBuilder("input");
@@ -72,7 +88,7 @@ namespace MvcCore.TagHelpers.QueryForm
                     controlTag.Attributes["class"] = "form-control";
                     controlTag.Attributes["placeholder"] = _queryParam.PlaceHolder;
                     controlTag.Attributes["type"] = Enum.GetName(typeof(InputControlType), _queryParam.ParamType);
-                    controlTag.Attributes["value"] = _queryParam.ParamValue?.ToString();
+                    controlTag.Attributes["value"] = _queryParam.ParamValue;
                     return controlTag;
             }
         }
