@@ -91,7 +91,7 @@ namespace MvcCore.TagHelpers
                     var template = new ColumnTemplate
                     {
                         ColumnName = propertyInfo.Name,
-                        HeaderName = string.IsNullOrWhiteSpace(displayName) ? displayName : propertyInfo.Name,
+                        HeaderName = string.IsNullOrWhiteSpace(displayName) ? propertyInfo.Name : displayName,
                     };
 
                     _columnTemplates.Add(template);
@@ -127,10 +127,21 @@ namespace MvcCore.TagHelpers
                 foreach (var column in _columnTemplates)
                 {
                     var colTd = new TagBuilder("td");
-                    colTd.InnerHtml.Append(!string.IsNullOrWhiteSpace(column.Template)
-                        ? Smart.Format(column.Template, rowItem)
-                        : rowItem.GetColumnValue(column.ColumnName).ToString());
+                    var colContent = string.Empty;
+                    if(!string.IsNullOrWhiteSpace(column.Template))
+                    {
+                        colContent = Smart.Format(column.Template, rowItem);
+                    }
+                    if(column.ColumnItemAction != null)
+                    {
+                        colContent = column.ColumnItemAction(rowItem.GetColumnValue(column.ColumnName));
+                    }
+                    if(string.IsNullOrWhiteSpace(colContent))
+                    {
+                        colContent = rowItem.GetColumnValue(column.ColumnName)?.ToString();
+                    }
 
+                    colTd.InnerHtml.AppendHtml(colContent);
                     colTd.MergeAttributes(column.ColumnAttributes);
                     bodyTr.InnerHtml.AppendHtml(colTd);
                 }

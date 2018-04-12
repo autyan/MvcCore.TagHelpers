@@ -28,22 +28,27 @@ namespace MvcCore.TagHelpers
 
         private static readonly List<string> GlobalIgnoreProperties;
 
+        static QueryFormTagHelper()
+        {
+            GlobalIgnoreProperties = new List<string>();
+        }
+
         public static void AddIgnoreProperty(string properties)
         {
-            GlobalIgnoreProperties.AddRange(properties.Split(','));
+            GlobalIgnoreProperties.AddRange(properties.Split(',').Select(p => p?.Trim()));
         }
 
         public override void Init(TagHelperContext context)
         {
             var ignoredProperties = new List<string>();
-            if(string.IsNullOrWhiteSpace(QueryIgnoreProperty))
+            if(!string.IsNullOrWhiteSpace(QueryIgnoreProperty))
             {
-                ignoredProperties.AddRange(QueryIgnoreProperty.Split(','));
+                ignoredProperties.AddRange(QueryIgnoreProperty.Split(',').Select(p => p?.Trim()));
             }
 
             foreach (var propertyInfo in Query.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (ignoredProperties.Any(i => i == propertyInfo.Name) && GlobalIgnoreProperties.Any(i => i == propertyInfo.Name)) continue;
+                if (ignoredProperties.Any(i => i == propertyInfo.Name) || GlobalIgnoreProperties.Any(i => i == propertyInfo.Name)) continue;
 
                 _queryParamConfigs.Add(new QueryParamConfig(propertyInfo, Query));
             }
@@ -81,7 +86,7 @@ namespace MvcCore.TagHelpers
             var panelBody = new TagBuilder("div");
             panelBody.Attributes["class"] = "panel-body";
 
-            foreach (var queryParam in _queryParamConfigs)
+            foreach (var queryParam in _queryParamConfigs.OrderBy(q => q.ParamIndex))
             {
                 var controlTag = new QueryParamTagBuilder(queryParam).Build();
                 panelBody.InnerHtml.AppendHtml(controlTag);

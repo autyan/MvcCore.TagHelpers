@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using MvcCore.TagHelpers.Extensions;
 
 namespace MvcCore.TagHelpers.QueryForm
@@ -15,7 +16,9 @@ namespace MvcCore.TagHelpers.QueryForm
 
         public object ParamData { get; set; }
 
-        public object ParamValue { get; set; }
+        public string ParamValue { get; set; }
+
+        public int ParamIndex { get; set; } = 999;
 
         public QueryParamConfig(PropertyInfo queryPropertyInfo, object query)
         {
@@ -23,8 +26,24 @@ namespace MvcCore.TagHelpers.QueryForm
             var displayName = queryPropertyInfo.GetDisplayName();
             ParamDisplayName = string.IsNullOrWhiteSpace(displayName) ? queryPropertyInfo.Name : displayName;
             PlaceHolder = ParamDisplayName;
+            ParamValue = GetValueString(queryPropertyInfo, query);
+        }
 
-            ParamValue = queryPropertyInfo.GetValue(query);
+        private string GetValueString(PropertyInfo queryPropertyInfo, object query)
+        {
+            if (query == null) return string.Empty;
+
+            var value = queryPropertyInfo.GetValue(query);
+
+            if (value == null) return string.Empty;
+
+            var propertyUnderType = Nullable.GetUnderlyingType(queryPropertyInfo.PropertyType);
+            if (queryPropertyInfo.PropertyType.IsEnum || ((propertyUnderType != null) && propertyUnderType.IsEnum))
+            {
+                return ((int)value).ToString();
+            }
+
+            return value.ToString();
         }
     }
 }

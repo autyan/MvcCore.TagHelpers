@@ -51,13 +51,13 @@ namespace MvcCore.TagHelpers.QueryForm
                     }
                     else
                     {
-                        var selected = _queryParam.ParamValue?.ToString();
+                        var selected = _queryParam.ParamValue;
                         foreach (var item in selectData)
                         {
                             var option = new TagBuilder("option");
                             option.Attributes["value"] = item.Value;
                             option.InnerHtml.Append(item.Text);
-                            if (item.Value == selected || item.Text == selected)
+                            if (item.Value == selected)
                             {
                                 option.Attributes[nameof(selected)] = nameof(selected);
                             }
