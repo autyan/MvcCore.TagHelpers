@@ -36,5 +36,10 @@ namespace McvCore.TagHelpers.Samples.Controllers
             };
             return View(tableItem);
         }
+
+        public IActionResult Upload()
+        {
+            return View();
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace McvCore.TagHelpers.Samples
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            MvcCoreTagHelpers.SetCulture("zh-CN");
+            MvcCoreTagHelpers.Instance.SetCulture("zh-CN");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
