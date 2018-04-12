@@ -51,13 +51,13 @@ namespace MvcCore.TagHelpers.QueryForm
                     }
                     else
                     {
-                        var selected = _queryParam.ParamValue.ToString();
+                        var selected = _queryParam.ParamValue;
                         foreach (var item in selectData)
                         {
                             var option = new TagBuilder("option");
                             option.Attributes["value"] = item.Value;
                             option.InnerHtml.Append(item.Text);
-                            if (item.Value == selected || item.Text == selected)
+                            if (item.Value == selected)
                             {
                                 option.Attributes[nameof(selected)] = nameof(selected);
                             }
@@ -65,7 +65,7 @@ namespace MvcCore.TagHelpers.QueryForm
                             selectTag.InnerHtml.AppendHtml(option);
                         }
                     }
-                    return null;
+                    return selectTag;
                 default:
                     var controlTag = new TagBuilder("input");
                     controlTag.Attributes["name"] = _queryParam.ParamName;

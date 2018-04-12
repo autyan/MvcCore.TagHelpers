@@ -18,6 +18,9 @@ namespace MvcCore.TagHelpers
         [HtmlAttributeName("query-control-data")]
         public object QueryControlObject { get; set; }
 
+        [HtmlAttributeName("query-control-index")]
+        public int Index { get; set; }
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var queryParamConfigs = (IList<QueryParamConfig>)context.Items[typeof(IList<QueryParamConfig>)];
@@ -35,6 +38,7 @@ namespace MvcCore.TagHelpers
             }
 
             me.ParamData = QueryControlObject;
+            me.ParamIndex = Index;
 
             output.SuppressOutput();
         }

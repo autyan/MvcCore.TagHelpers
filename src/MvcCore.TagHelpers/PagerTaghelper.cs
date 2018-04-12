@@ -78,7 +78,7 @@ namespace MvcCore.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";
-
+            
             var ulTag = new TagBuilder("ul");
             ulTag.Attributes["class"] = "pagination";
 
@@ -149,7 +149,6 @@ namespace MvcCore.TagHelpers
                 };
 
             ulTag.InnerHtml.AppendHtml(endTag.Build());
-
             var navTag = new TagBuilder("nav");
             navTag.Attributes["style"] = "float:right";
             navTag.InnerHtml.AppendHtml(ulTag);

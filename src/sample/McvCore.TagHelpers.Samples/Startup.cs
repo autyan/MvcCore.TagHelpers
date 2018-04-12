@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MvcCore.TagHelpers;
 
 namespace McvCore.TagHelpers.Samples
 {
@@ -18,6 +19,7 @@ namespace McvCore.TagHelpers.Samples
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            MvcCoreTagHelpers.Instance.SetCulture("zh-CN");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

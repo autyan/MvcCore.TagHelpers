@@ -8,10 +8,13 @@
         Age = 31,
         Name = "Alex"
     };
+    var sel = new SelectList(new SelectListItem[] { new SelectListItem { Text = "1", Value = "0" } });
 }
 
 <div>
-    <query-form item-source="@query"></query-form>
+    <query-form item-source="@query">
+        <query-control query-name="Type" query-type="Select" query-control-data="@sel"></query-control>
+    </query-form>
     <mvc-table class="table table-bordered table-hover table-striped" item-source="@Model" column-ignore="Id"></mvc-table>
     <mvc-pager pager-take="20" pager-skip="0" pager-totalcount="20000"></mvc-pager>
 </div>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -22,10 +23,33 @@ namespace MvcCore.TagHelpers
         [HtmlAttributeName("query-class")]
         public string QueryControlClass { get; set; }
 
+        [HtmlAttributeName("query-ignore")]
+        public string QueryIgnoreProperty { get; set; }
+
+        private static readonly List<string> GlobalIgnoreProperties;
+
+        static QueryFormTagHelper()
+        {
+            GlobalIgnoreProperties = new List<string>();
+        }
+
+        public static void AddIgnoreProperty(string properties)
+        {
+            GlobalIgnoreProperties.AddRange(properties.Split(',').Select(p => p?.Trim()));
+        }
+
         public override void Init(TagHelperContext context)
         {
+            var ignoredProperties = new List<string>();
+            if(!string.IsNullOrWhiteSpace(QueryIgnoreProperty))
+            {
+                ignoredProperties.AddRange(QueryIgnoreProperty.Split(',').Select(p => p?.Trim()));
+            }
+
             foreach (var propertyInfo in Query.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
+                if (ignoredProperties.Any(i => i == propertyInfo.Name) || GlobalIgnoreProperties.Any(i => i == propertyInfo.Name)) continue;
+
                 _queryParamConfigs.Add(new QueryParamConfig(propertyInfo, Query));
             }
             base.Init(context);
@@ -62,7 +86,7 @@ namespace MvcCore.TagHelpers
             var panelBody = new TagBuilder("div");
             panelBody.Attributes["class"] = "panel-body";
 
-            foreach (var queryParam in _queryParamConfigs)
+            foreach (var queryParam in _queryParamConfigs.OrderBy(q => q.ParamIndex))
             {
                 var controlTag = new QueryParamTagBuilder(queryParam).Build();
                 panelBody.InnerHtml.AppendHtml(controlTag);
@@ -77,7 +101,7 @@ namespace MvcCore.TagHelpers
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            submit.Attributes["value"] = "Submit";
+            submit.Attributes["value"] = MvcTaghelperStringLocalizer.Instance["Submit"];
             submit.Attributes["type"] = "submit";
             submit.Attributes["class"] = "btn btn-primary pull-right";
 
@@ -85,7 +109,7 @@ namespace MvcCore.TagHelpers
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            reset.Attributes["value"] = "Reset";
+            reset.Attributes["value"] = MvcTaghelperStringLocalizer.Instance["Reset"];
             reset.Attributes["type"] = "reset";
             reset.Attributes["class"] = "btn btn-danger pull-right";
 

@@ -30,5 +30,8 @@ namespace McvCore.TagHelpers.Samples.Models
 
         [Display(Name = "年龄")]
         public int Age { get; set; }
+
+        [Display(Name = "类型")]
+        public string Type { get; set; }
     }
 }

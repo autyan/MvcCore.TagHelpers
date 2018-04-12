@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MvcCore.TagHelpers\MvcCore.TagHelpers.csproj" />
+    <ProjectReference Include="..\..\MvcCore.TagHelpers\MvcCore.TagHelpers.csproj" />
   </ItemGroup>
 
 </Project>
