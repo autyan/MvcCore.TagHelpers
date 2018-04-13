@@ -1,23 +1,68 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MvcCore.TagHelpers.Extensions;
 
 namespace MvcCore.TagHelpers.QueryForm
 {
-    public class QueryParamTagBuilder : IElementTagBuilder
+    public class QueryParamTagBuilder : IQueryParamElementTagBuilder
     {
-        private readonly QueryParamConfig _queryParam;
+        public string ParamName { get; set; }
 
-        public QueryParamTagBuilder(QueryParamConfig queryParam)
+        public string ParamDisplayName { get; set; }
+
+        public string PlaceHolder { get; set; }
+
+        public InputControlType ParamType { get; set; } = InputControlType.Text;
+
+        public object ParamData { get; set; }
+
+        public string ParamValue { get; set; }
+
+        public int ParamIndex { get; set; } = 999;
+
+        internal QueryParamTagBuilder(IQueryParamElementTagBuilder builder)
         {
-            _queryParam = queryParam;
+            ParamName = builder.ParamName;
+            ParamDisplayName = builder.ParamDisplayName;
+            PlaceHolder = builder.PlaceHolder;
+            ParamType = builder.ParamType;
+            ParamData = builder.ParamData;
+            ParamValue = builder.ParamValue;
+            ParamIndex = builder.ParamIndex;
         }
 
-        public TagBuilder Build()
+        public QueryParamTagBuilder(PropertyInfo queryPropertyInfo, object query)
+        {
+            ParamName = queryPropertyInfo.Name;
+            var displayName = queryPropertyInfo.GetDisplayName();
+            ParamDisplayName = string.IsNullOrWhiteSpace(displayName) ? queryPropertyInfo.Name : displayName;
+            PlaceHolder = ParamDisplayName;
+            ParamValue = GetValueString(queryPropertyInfo, query);
+        }
+
+        private static string GetValueString(PropertyInfo queryPropertyInfo, object query)
+        {
+            if (query == null) return string.Empty;
+
+            var value = queryPropertyInfo.GetValue(query);
+
+            if (value == null) return string.Empty;
+
+            var propertyUnderType = Nullable.GetUnderlyingType(queryPropertyInfo.PropertyType);
+            if (queryPropertyInfo.PropertyType.IsEnum || propertyUnderType?.IsEnum == true)
+            {
+                return ((int)value).ToString();
+            }
+
+            return value.ToString();
+        }
+
+        public virtual TagBuilder Build()
         {
             var label = new TagBuilder("label");
-            label.Attributes["for"] = _queryParam.ParamName;
-            label.InnerHtml.Append(_queryParam.ParamDisplayName);
+            label.Attributes["for"] = ParamName;
+            label.InnerHtml.Append(ParamDisplayName);
             var content = BuildControlTag();
 
             var inputGroupAddon = new TagBuilder("div");
@@ -36,61 +81,15 @@ namespace MvcCore.TagHelpers.QueryForm
             return formGroup;
         }
 
-        private TagBuilder BuildControlTag()
+        protected virtual TagBuilder BuildControlTag()
         {
-            switch (_queryParam.ParamType)
-            {
-                case InputControlType.Select:
-                    var selectTag = new TagBuilder("select");
-                    selectTag.Attributes["name"] = _queryParam.ParamName;
-                    selectTag.Attributes["class"] = "form-control";
-                    selectTag.Attributes["placeholder"] = _queryParam.PlaceHolder;
-                    var selected = _queryParam.ParamValue;
-                    if (_queryParam.ParamData is SelectList selectList)
-                    {
-                        foreach (var item in selectList.Items)
-                        {
-                            if(!(item is SelectListItem selectItem)) throw new ArgumentException("Select control data source have to be type of (IEnumerable<SelectListItem>) or (SelectList)");
-                            var option = new TagBuilder("option");
-                            option.Attributes["value"] = selectItem.Value;
-                            option.InnerHtml.Append(selectItem.Text);
-                            if (selectItem.Value == selected)
-                            {
-                                option.Attributes[nameof(selected)] = nameof(selected);
-                            }
-
-                            selectTag.InnerHtml.AppendHtml(option);
-                        }
-                    }
-                    else if (_queryParam.ParamData is IEnumerable<SelectListItem> selectData)
-                    {
-                        foreach (var item in selectData)
-                        {
-                            var option = new TagBuilder("option");
-                            option.Attributes["value"] = item.Value;
-                            option.InnerHtml.Append(item.Text);
-                            if (item.Value == selected)
-                            {
-                                option.Attributes[nameof(selected)] = nameof(selected);
-                            }
-
-                            selectTag.InnerHtml.AppendHtml(option);
-                        }
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Select control data source have to be type of (IEnumerable<SelectListItem>) or (SelectList)");
-                    }
-                    return selectTag;
-                default:
-                    var controlTag = new TagBuilder("input");
-                    controlTag.Attributes["name"] = _queryParam.ParamName;
-                    controlTag.Attributes["class"] = "form-control";
-                    controlTag.Attributes["placeholder"] = _queryParam.PlaceHolder;
-                    controlTag.Attributes["type"] = Enum.GetName(typeof(InputControlType), _queryParam.ParamType);
-                    controlTag.Attributes["value"] = _queryParam.ParamValue;
-                    return controlTag;
-            }
+            var controlTag = new TagBuilder("input");
+            controlTag.Attributes["name"] = ParamName;
+            controlTag.Attributes["class"] = "form-control";
+            controlTag.Attributes["placeholder"] = PlaceHolder;
+            controlTag.Attributes["type"] = Enum.GetName(typeof(InputControlType), ParamType);
+            controlTag.Attributes["value"] = ParamValue;
+            return controlTag;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MvcCore.TagHelpers
     {
         private const string DefaultId = "queryForm";
 
-        private readonly IList<QueryParamConfig> _queryParamConfigs = new List<QueryParamConfig>();
+        private readonly IList<IQueryParamElementTagBuilder> _queryParamElementTagBuilders = new List<IQueryParamElementTagBuilder>();
 
         [HtmlAttributeName("item-source")]
         public object Query { get; set; }
@@ -50,14 +50,14 @@ namespace MvcCore.TagHelpers
             {
                 if (ignoredProperties.Any(i => i == propertyInfo.Name) || GlobalIgnoreProperties.Any(i => i == propertyInfo.Name)) continue;
 
-                _queryParamConfigs.Add(new QueryParamConfig(propertyInfo, Query));
+                _queryParamElementTagBuilders.Add(new QueryParamTagBuilder(propertyInfo, Query));
             }
             base.Init(context);
         }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            context.Items[typeof(IList<QueryParamConfig>)] = _queryParamConfigs;
+            context.Items[typeof(IList<IQueryParamElementTagBuilder>)] = _queryParamElementTagBuilders;
 
             output.TagName = "div";
             var childContent = output.GetChildContentAsync().Result;
@@ -86,9 +86,9 @@ namespace MvcCore.TagHelpers
             var panelBody = new TagBuilder("div");
             panelBody.Attributes["class"] = "panel-body";
 
-            foreach (var queryParam in _queryParamConfigs.OrderBy(q => q.ParamIndex))
+            foreach (var tagBuilder in _queryParamElementTagBuilders.OrderBy(q => q.ParamIndex))
             {
-                var controlTag = new QueryParamTagBuilder(queryParam).Build();
+                var controlTag = tagBuilder.Build();
                 panelBody.InnerHtml.AppendHtml(controlTag);
             }
 
@@ -102,7 +102,7 @@ namespace MvcCore.TagHelpers
                 TagRenderMode = TagRenderMode.SelfClosing
             };
             submit.Attributes["value"] = MvcTaghelperStringLocalizer.Instance["Submit"];
-            submit.Attributes["type"] = "submit";
+            submit.Attributes["type"] = nameof(submit);
             submit.Attributes["class"] = "btn btn-primary pull-right";
 
             var reset = new TagBuilder("input")
@@ -110,7 +110,7 @@ namespace MvcCore.TagHelpers
                 TagRenderMode = TagRenderMode.SelfClosing
             };
             reset.Attributes["value"] = MvcTaghelperStringLocalizer.Instance["Reset"];
-            reset.Attributes["type"] = "reset";
+            reset.Attributes["type"] = nameof(reset);
             reset.Attributes["class"] = "btn btn-danger pull-right";
 
             var panelFooter = new TagBuilder("div");
