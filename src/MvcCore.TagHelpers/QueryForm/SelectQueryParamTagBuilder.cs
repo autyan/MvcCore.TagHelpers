@@ -13,6 +13,8 @@ namespace MvcCore.TagHelpers.QueryForm
 
         public string TextPropertyName { get; set; }
 
+        public IEnumerable SelectOptions { get; set; }
+
         private static readonly Dictionary<Type, IList<PropertyInfo>> SelectItemPropertyCache = new Dictionary<Type, IList<PropertyInfo>>();
 
         internal SelectQueryParamTagBuilder(IQueryParamElementTagBuilder builder) : base(builder)
@@ -26,27 +28,26 @@ namespace MvcCore.TagHelpers.QueryForm
             selectTag.Attributes["name"] = ParamName;
             selectTag.Attributes["class"] = "form-control";
             selectTag.Attributes["placeholder"] = PlaceHolder;
+            if (SelectOptions == null) return selectTag;
             var selected = ParamValue;
-            if (ParamData is IEnumerable selectOptions)
+            if (SelectOptions is SelectList selectList)
             {
-                foreach (var item in selectOptions)
+                SelectOptions = selectList.Items;
+            }
+            foreach (var item in SelectOptions)
+            {
+                var option = new TagBuilder("option");
+                var keyValue = GetSelectOptionKeyValuePair(item);
+                option.Attributes["value"] = keyValue.Key;
+                option.InnerHtml.Append(keyValue.Value);
+                if (keyValue.Key == selected)
                 {
-                    var option = new TagBuilder("option");
-                    var keyValue = GetSelectOptionKeyValuePair(item);
-                    option.Attributes["value"] = keyValue.Key;
-                    option.InnerHtml.Append(keyValue.Value);
-                    if (keyValue.Key == selected)
-                    {
-                        option.Attributes[nameof(selected)] = nameof(selected);
-                    }
-
-                    selectTag.InnerHtml.AppendHtml(option);
+                    option.Attributes[nameof(selected)] = nameof(selected);
                 }
+
+                selectTag.InnerHtml.AppendHtml(option);
             }
-            else
-            {
-                throw new ArgumentException("Select control data source have to be type of (IEnumerable)");
-            }
+
             return selectTag;
         }
 

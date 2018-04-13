@@ -10,8 +10,6 @@
 
         InputControlType ParamType { get; set; }
 
-        object ParamData { get; set; }
-
         string ParamValue { get; set; }
 
         int ParamIndex { get; set; }

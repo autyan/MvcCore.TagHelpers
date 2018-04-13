@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using MvcCore.TagHelpers.QueryForm;
 
@@ -13,12 +14,15 @@ namespace MvcCore.TagHelpers
         [HtmlAttributeName("option-text-name")]
         public string OptionTextName { get; set; } = "Text";
 
+        [HtmlAttributeName("option-data")]
+        public IEnumerable Options { get; set; }
+
         public SelectQueryControlTagHelper()
         {
             QueryType = "Select";
         }
 
-        protected override void SetupBuilder(IQueryParamElementTagBuilder builder)
+        protected override IQueryParamElementTagBuilder SetupBuilder(IQueryParamElementTagBuilder builder)
         {
             var selectBuilder = new SelectQueryParamTagBuilder(builder)
             {
@@ -38,8 +42,9 @@ namespace MvcCore.TagHelpers
                 selectBuilder.ParamType = InputControlType.Text;
             }
 
-            selectBuilder.ParamData = QueryControlObject;
-            selectBuilder.ParamIndex = Index;
+            selectBuilder.SelectOptions = Options;
+
+            return selectBuilder;
         }
     }
 }

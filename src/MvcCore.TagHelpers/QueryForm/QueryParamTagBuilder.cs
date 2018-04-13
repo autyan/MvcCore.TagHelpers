@@ -15,8 +15,6 @@ namespace MvcCore.TagHelpers.QueryForm
 
         public InputControlType ParamType { get; set; } = InputControlType.Text;
 
-        public object ParamData { get; set; }
-
         public string ParamValue { get; set; }
 
         public int ParamIndex { get; set; } = 999;
@@ -27,7 +25,6 @@ namespace MvcCore.TagHelpers.QueryForm
             ParamDisplayName = builder.ParamDisplayName;
             PlaceHolder = builder.PlaceHolder;
             ParamType = builder.ParamType;
-            ParamData = builder.ParamData;
             ParamValue = builder.ParamValue;
             ParamIndex = builder.ParamIndex;
         }

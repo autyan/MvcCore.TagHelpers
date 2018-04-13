@@ -13,7 +13,7 @@
 
 <div>
     <query-form item-source="@query">
-        <query-control-select query-name="Type" query-control-data="@sel.Items"></query-control-select>
+        <query-control-select query-name="Type" option-data="@sel.Items"></query-control-select>
     </query-form>
     <mvc-table class="table table-bordered table-hover table-striped" item-source="@Model" column-ignore="Id"></mvc-table>
     <mvc-pager pager-take="20" pager-skip="0" pager-totalcount="20000"></mvc-pager>
