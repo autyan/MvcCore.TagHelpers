@@ -20,8 +20,6 @@ namespace MvcCore.TagHelpers
 
         private int? _skip;
 
-        //private readonly StringBuilder _tageBuilder = new StringBuilder();
-
         private readonly HttpContext _httpContext;
 
         [HtmlAttributeName("pager-skip")]

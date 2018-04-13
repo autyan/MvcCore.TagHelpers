@@ -13,5 +13,7 @@
         string ParamValue { get; set; }
 
         int ParamIndex { get; set; }
+
+        string Class { get; set; }
     }
 }

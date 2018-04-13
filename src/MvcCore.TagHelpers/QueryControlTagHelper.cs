@@ -18,6 +18,9 @@ namespace MvcCore.TagHelpers
         [HtmlAttributeName("query-control-index")]
         public int? Index { get; set; }
 
+        [HtmlAttributeName("query-control-class")]
+        public string Class { get; set; }
+
         protected IList<IQueryParamElementTagBuilder> QueryTagBuilders;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -31,6 +34,8 @@ namespace MvcCore.TagHelpers
             {
                 me.ParamIndex = Index.Value;
             }
+
+            me.Class = Class;
             output.SuppressOutput();
         }
 

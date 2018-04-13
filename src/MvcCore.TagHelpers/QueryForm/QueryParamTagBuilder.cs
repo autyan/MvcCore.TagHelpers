@@ -18,6 +18,7 @@ namespace MvcCore.TagHelpers.QueryForm
         public string ParamValue { get; set; }
 
         public int ParamIndex { get; set; } = 999;
+        public string Class { get; set; }
 
         internal QueryParamTagBuilder(IQueryParamElementTagBuilder builder)
         {
@@ -73,6 +74,10 @@ namespace MvcCore.TagHelpers.QueryForm
 
             var formGroup = new TagBuilder("div");
             formGroup.Attributes["class"] = "form-group";
+            if (string.IsNullOrWhiteSpace(Class))
+            {
+                formGroup.MergeAttribute("class", Class);
+            }
             formGroup.InnerHtml.AppendHtml(inputGroup);
 
             return formGroup;

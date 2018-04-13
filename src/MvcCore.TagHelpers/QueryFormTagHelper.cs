@@ -14,6 +14,12 @@ namespace MvcCore.TagHelpers
 
         private readonly IList<IQueryParamElementTagBuilder> _queryParamElementTagBuilders = new List<IQueryParamElementTagBuilder>();
 
+        private static readonly List<string> GlobalIgnoreProperties;
+
+        private readonly List<string> _ignoreProperties = new List<string>();
+
+        private readonly List<string> _includeProperties = new List<string>();
+
         [HtmlAttributeName("item-source")]
         public object Query { get; set; }
 
@@ -24,9 +30,17 @@ namespace MvcCore.TagHelpers
         public string QueryControlClass { get; set; }
 
         [HtmlAttributeName("query-ignore")]
-        public string QueryIgnoreProperty { get; set; }
+        public string QueryIgnoreProperty {
+            get => string.Join(",", _ignoreProperties);
+            set => _ignoreProperties.AddRange(value.Split(','));
+        }
 
-        private static readonly List<string> GlobalIgnoreProperties;
+        [HtmlAttributeName("query-include")]
+        public string QueryIncludeProperty
+        {
+            get => string.Join(",", _includeProperties);
+            set => _includeProperties.AddRange(value.Split(','));
+        }
 
         static QueryFormTagHelper()
         {
@@ -40,17 +54,16 @@ namespace MvcCore.TagHelpers
 
         public override void Init(TagHelperContext context)
         {
-            var ignoredProperties = new List<string>();
-            if(!string.IsNullOrWhiteSpace(QueryIgnoreProperty))
-            {
-                ignoredProperties.AddRange(QueryIgnoreProperty.Split(',').Select(p => p?.Trim()));
-            }
-
             foreach (var propertyInfo in Query.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (ignoredProperties.Any(i => i == propertyInfo.Name) || GlobalIgnoreProperties.Any(i => i == propertyInfo.Name)) continue;
+                if ((_ignoreProperties.Any(i => i == propertyInfo.Name) || GlobalIgnoreProperties.Any(i => i == propertyInfo.Name))
+                    && _includeProperties.All(p => p != propertyInfo.Name))
+                {
+                    continue;
+                }
 
                 _queryParamElementTagBuilders.Add(new QueryParamTagBuilder(propertyInfo, Query));
+
             }
             base.Init(context);
         }
@@ -89,6 +102,10 @@ namespace MvcCore.TagHelpers
             foreach (var tagBuilder in _queryParamElementTagBuilders.OrderBy(q => q.ParamIndex))
             {
                 var controlTag = tagBuilder.Build();
+                if (QueryControlClass != null)
+                {
+                    controlTag.MergeAttribute("class", QueryControlClass);
+                }
                 panelBody.InnerHtml.AppendHtml(controlTag);
             }
 
