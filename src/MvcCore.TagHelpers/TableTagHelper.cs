@@ -84,8 +84,12 @@ namespace MvcCore.TagHelpers
             {
                 foreach (var pair in _columns)
                 {
-                    if (ignoreColumns != null && ignoreColumns.Contains(pair.Key) 
-                        || GlobalIgnoreProperties.Contains(pair.Key)) continue;
+                    if (ignoreColumns != null && ignoreColumns.Contains(pair.Key)
+                        || GlobalIgnoreProperties.Contains(pair.Key))
+                    {
+                        continue;
+                    }
+
                     _columnTemplates.Add(new ColumnTemplate
                     {
                         ColumnName = pair.Key,
@@ -97,8 +101,11 @@ namespace MvcCore.TagHelpers
             {
                 foreach (var propertyInfo in _rowItemCollection.ItemPropertyInfos)
                 {
-                    if (ignoreColumns != null && ignoreColumns.Contains(propertyInfo.Name) 
-                        || GlobalIgnoreProperties.Contains(propertyInfo.Name)) continue;
+                    if (ignoreColumns != null && ignoreColumns.Contains(propertyInfo.Name)
+                        || GlobalIgnoreProperties.Contains(propertyInfo.Name))
+                    {
+                        continue;
+                    }
 
                     var displayName = propertyInfo.GetDisplayName();
 

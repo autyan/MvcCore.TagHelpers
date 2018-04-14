@@ -21,7 +21,8 @@ namespace McvCore.TagHelpers.Samples
         {
             services.AddMvc();
             MvcCoreTagHelpers.Instance.SetCulture("zh-CN")
-                .SetQueryIgnore(typeof(TableQuery));
+                .SetQueryIgnore(typeof(TableQuery))
+                .SetTableIgnore(typeof(BaseEntity<,>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

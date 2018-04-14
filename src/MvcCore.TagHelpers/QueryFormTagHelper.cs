@@ -20,6 +20,8 @@ namespace MvcCore.TagHelpers
 
         private readonly List<string> _includeProperties = new List<string>();
 
+        private readonly List<TagHelperContent> _buttonContents = new List<TagHelperContent>();
+
         [HtmlAttributeName("item-source")]
         public object Query { get; set; }
 
@@ -71,10 +73,11 @@ namespace MvcCore.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             context.Items[typeof(IList<IQueryParamElementTagBuilder>)] = _queryParamElementTagBuilders;
+            context.Items[typeof(List<TagHelperContent>)] = _buttonContents;
 
             output.TagName = "div";
             var childContent = output.GetChildContentAsync().Result;
-            output.Content.AppendHtml(childContent);
+            childContent.Clear();
 
             output.Attributes.SetAttribute("class", "panel panel-default");
             var form = new TagBuilder("form");
@@ -112,7 +115,7 @@ namespace MvcCore.TagHelpers
             return panelBody;
         }
 
-        private static TagBuilder AppendQueryButtonInputs()
+        private TagBuilder AppendQueryButtonInputs()
         {
             var submit = new TagBuilder("input")
             {
@@ -132,6 +135,10 @@ namespace MvcCore.TagHelpers
 
             var panelFooter = new TagBuilder("div");
             panelFooter.Attributes["class"] = "panel-footer";
+            foreach (var content in _buttonContents)
+            {
+                panelFooter.InnerHtml.AppendHtml(content);
+            }
             panelFooter.InnerHtml.AppendHtml(submit).AppendHtml(reset);
 
             return panelFooter;

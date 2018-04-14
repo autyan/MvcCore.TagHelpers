@@ -41,7 +41,7 @@ namespace MvcCore.TagHelpers
         {
             foreach (var propertyInfo in ignoreType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                QueryFormTagHelper.AddIgnoreProperty(propertyInfo.Name);
+                TableTagHelper.AddIgnoreProperty(propertyInfo.Name);
             }
             return Instance;
         }
