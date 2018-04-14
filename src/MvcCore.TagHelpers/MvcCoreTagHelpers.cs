@@ -11,13 +11,18 @@ namespace MvcCore.TagHelpers
         public MvcCoreTagHelpers SetCulture(string culture)
         {
             MvcTaghelperStringLocalizer.CultureInfo = new CultureInfo(culture);
-
             return Instance;
         }
 
         public MvcCoreTagHelpers SetQueryIgnore(string ingoreProperties)
         {
             QueryFormTagHelper.AddIgnoreProperty(ingoreProperties);
+            return Instance;
+        }
+
+        public MvcCoreTagHelpers SetTableIgnore(string ingoreProperties)
+        {
+            TableTagHelper.AddIgnoreProperty(ingoreProperties);
             return Instance;
         }
     }

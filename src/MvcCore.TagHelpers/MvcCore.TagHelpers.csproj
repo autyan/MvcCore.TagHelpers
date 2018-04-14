@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.1.3.0414-prerelease-00000010</Version>
+    <Version>0.1.4.0414-prerelease-00000011</Version>
     <Authors>Autyan</Authors>
     <Description>Simple taghelpers based on bootstrap v3</Description>
     <PackageProjectUrl>https://github.com/autyan/MvcCore.TagHelpers</PackageProjectUrl>

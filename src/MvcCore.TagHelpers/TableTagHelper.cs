@@ -18,6 +18,8 @@ namespace MvcCore.TagHelpers
 
         private IList<ColumnTemplate> _columnTemplates;
 
+        private static readonly List<string> GlobalIgnoreProperties;
+
         [HtmlAttributeName("item-source")]
         public IEnumerable Items { get; set; }
 
@@ -29,6 +31,16 @@ namespace MvcCore.TagHelpers
 
         [HtmlAttributeName("table-form-id")]
         public string FromId { get; set; } = "queryForm";
+
+        static TableTagHelper()
+        {
+            GlobalIgnoreProperties = new List<string>();
+        }
+
+        public static void AddIgnoreProperty(string properties)
+        {
+            GlobalIgnoreProperties.AddRange(properties.Split(',').Select(p => p?.Trim()));
+        }
 
         public override void Init(TagHelperContext context)
         {
@@ -72,7 +84,8 @@ namespace MvcCore.TagHelpers
             {
                 foreach (var pair in _columns)
                 {
-                    if (ignoreColumns != null && ignoreColumns.Contains(pair.Key)) continue;
+                    if (ignoreColumns != null && ignoreColumns.Contains(pair.Key) 
+                        || GlobalIgnoreProperties.Contains(pair.Key)) continue;
                     _columnTemplates.Add(new ColumnTemplate
                     {
                         ColumnName = pair.Key,
@@ -84,7 +97,8 @@ namespace MvcCore.TagHelpers
             {
                 foreach (var propertyInfo in _rowItemCollection.ItemPropertyInfos)
                 {
-                    if (ignoreColumns != null && ignoreColumns.Contains(propertyInfo.Name)) continue;
+                    if (ignoreColumns != null && ignoreColumns.Contains(propertyInfo.Name) 
+                        || GlobalIgnoreProperties.Contains(propertyInfo.Name)) continue;
 
                     var displayName = propertyInfo.GetDisplayName();
 

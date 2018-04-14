@@ -20,6 +20,8 @@ namespace MvcCore.TagHelpers
 
         private int? _skip;
 
+        private int? _take;
+
         private readonly HttpContext _httpContext;
 
         [HtmlAttributeName("pager-skip")]
@@ -30,7 +32,11 @@ namespace MvcCore.TagHelpers
         }
 
         [HtmlAttributeName("pager-take")]
-        public int? Take { get; set; }
+        public int? Take
+        {
+            get => _take ?? (_take = 10);
+            set => _take = value;
+        }
 
         [HtmlAttributeName("pager-totalCount")]
         public long? TotalCount { get; set; }
@@ -76,7 +82,7 @@ namespace MvcCore.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";
-            
+
             var ulTag = new TagBuilder("ul");
             ulTag.Attributes["class"] = "pagination";
 
