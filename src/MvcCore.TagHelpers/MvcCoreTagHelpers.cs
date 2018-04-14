@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Reflection;
 
 namespace MvcCore.TagHelpers
 {
@@ -23,6 +25,24 @@ namespace MvcCore.TagHelpers
         public MvcCoreTagHelpers SetTableIgnore(string ingoreProperties)
         {
             TableTagHelper.AddIgnoreProperty(ingoreProperties);
+            return Instance;
+        }
+
+        public MvcCoreTagHelpers SetQueryIgnore(Type ignoreType)
+        {
+            foreach (var propertyInfo in ignoreType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                QueryFormTagHelper.AddIgnoreProperty(propertyInfo.Name);
+            }
+            return Instance;
+        }
+
+        public MvcCoreTagHelpers SetTableIgnore(Type ignoreType)
+        {
+            foreach (var propertyInfo in ignoreType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                QueryFormTagHelper.AddIgnoreProperty(propertyInfo.Name);
+            }
             return Instance;
         }
     }
