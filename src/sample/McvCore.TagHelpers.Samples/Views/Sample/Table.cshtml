@@ -15,6 +15,26 @@
     <query-form item-source="@query">
         <query-control-select query-name="Type" option-data="@sel.Items"></query-control-select>
     </query-form>
-    <mvc-table class="table table-bordered table-hover table-striped" item-source="@Model" column-ignore="Id"></mvc-table>
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <td>姓名</td>
+            <td>年龄</td>
+        </tr>
+        </thead>
+        @{
+            foreach (var data in Model)
+            {
+                <row>
+                    <column>
+                        @data.Name
+                    </column>
+                    <column>
+                        @data.Age
+                    </column>
+                </row>
+            }
+        }
+    </table>
     <mvc-pager pager-take="20" pager-skip="0" pager-totalcount="20000"></mvc-pager>
 </div>
