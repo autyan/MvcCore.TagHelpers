@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/sample/McvCore.TagHelpers.Samples/McvCore.TagHelpers.Samples.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
